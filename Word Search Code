@@ -1,0 +1,408 @@
+3# 1. Please complete the following:
+#   Your First name and Last Name: Alisha Malik
+#   Your Student ID: 261071602
+
+# 2. Write your program here: 
+
+#Global variables 
+POS_DIRECTION = 1
+NEG_DIRECTION = -1
+
+# Question 1
+def is_outside_list(letter_list,index):
+    """
+
+    Description:
+        Checks if the inputted index is out
+        of bounds in regards to the lenghth of the list 
+
+    Parameters:
+    -----------
+    Input:  list: 
+                list of letters 
+            integer:
+                an index
+
+    Returns:boolean
+            whether input is out of bounds of list lenght
+    --------
+    Examples:
+    >>> is_outside_list(["A","R","C","K"],1)
+    False
+     >>> is_outside_list(["A","R","C","K"],4)
+    True
+     >>> is_outside_list(["A","R","C","K"],-3) 
+    True
+  
+    """
+    if index >= len(letter_list) or index<0 :
+        return True #True if out of list or negative 
+    else:
+        return False 
+
+# Question 2 
+def letter_positions(letter_list,character):
+    """
+    Description: Searches for inputted character's indicie in letter_list and 
+    returns an empty list if character is not in list.
+
+    Parameters:
+    -----------2
+    Input:  list: 
+                list of letters 
+            string:
+                character
+
+    Returns: A list
+                indices of inputted character in letter_list
+    
+    --------
+    Examples:
+    >>> letter_positions(["A","R","C","K"],"R")
+    [1]
+     >>> letter_positions(["A","R","C","K","R"],"R")
+    [1,4]
+     >>> letter_positions(["A","R","C","K"],"T") 
+    []
+    """
+    character_position = []
+    for i in range (len(letter_list)):
+        if letter_list[i]==character:
+            character_position.append(i) #if char not found, returns empty list
+    return character_position
+
+#Question 3 
+def valid_word_pos_direction(letter_list, word, index, direction):
+    """
+    Description: Function calls is_outside_list and valid_word_pos_direction to 
+    validate that the indice position and direction are in the list and
+    determines if the letters in the list match the ones in the word.
+
+    Parameters:
+    -----------
+    Input:  list: 
+                list of letters 
+            string:
+                A word
+            int:
+                the index and direction
+
+    Returns: A Boolean 
+                Whether word is found at inputted direction and index  
+
+    --------
+    Examples:
+    >>> valid_word_pos_direction(["A","R","C","K","R"],"ARC",0,1)
+    True
+     >>> valid_word_pos_direction(["A","R","C","K","R"],"ARC",2,1)
+    False 
+     >>> valid_word_pos_direction(["A","R","C","K","R"],"RKC",4,-1)
+    True
+    """
+    #make sure its in the index
+    if is_outside_list(letter_list,index):
+        return False 
+
+    #looping through word to see if index is increased in that direction 
+    for x in range(len(word)):
+        increasing_index = (x * direction)+ index  
+    #checks to see if word in list is in specific direction
+        if is_outside_list(letter_list, increasing_index) or \
+        (letter_list[increasing_index]!=word[x]):
+            return False
+    return True
+    
+   
+# Question 4 
+def direction_word_given_position(letter_list, word, index):
+#sees which direction to move in  
+    """
+    Description: Searches for inputted character's indicie by calling 
+    valid_word_pos_direction to search in both directions of the letter_list
+
+    Parameters:
+    -----------
+    Input:  list: 
+                list of letters 
+            string:
+                A word
+            int:
+                the index
+
+    Returns: A list 
+                list of directions for the location of the word 
+
+    --------
+    Examples:
+    >>> direction_word_given_position(["A","R","C","K","R"],"RKC", 4)
+    [-1]
+     >>> direction_word_given_position(["A","R","C","K","R"],"ARC", 0)
+    [1]
+     >>> direction_word_given_position(["A","C","R","C","K"],"RC", 2)
+    [1,-1]
+    """
+    list_directions = []
+    #for neg direction
+    if valid_word_pos_direction(letter_list, word, index, NEG_DIRECTION):
+        list_directions.append(NEG_DIRECTION)
+    #for pos direction
+    if valid_word_pos_direction(letter_list, word, index, POS_DIRECTION):
+        list_directions.append(POS_DIRECTION)
+        
+    return list_directions
+
+
+#Question 5
+def position_direction_word(letter_list,word):
+    """
+    Description: calls direction_word_given_position and letter_positions 
+    to find all starting indices of the word in the list 
+    in both directions. Then the functions returns these directions
+    positions in dictionary form.
+     
+    Parameters:
+    -----------
+    Input:  list: 
+                list of letters 
+            string:
+                A word
+
+    Returns: Dict:
+             the position and direcion of the word in the list   
+
+    --------
+    Examples:
+    >>> position_direction_word(["A","R","C","K","R"],"ARC")
+    {0: [1]}
+     >>> position_direction_word(["A","C","R","C","K"],"CR")
+    {1: [1], 3: [-1]}
+     >>> position_direction_word(["A","C","R","C","K"],"RC")
+    {2: [-1, 1]}
+    """
+    spot={}
+    #search position of first letter of word
+    positions = letter_positions(letter_list, word[0])
+    for p in positions: 
+        #if entire word can be found in either direction
+        directions = direction_word_given_position(letter_list, word, p)
+        spot[p]=directions #adds to empty dictionary spot
+    return spot
+
+
+# Question 6 
+def cross_word_position_direction(letter_list,word,index,direction):
+    """
+    Description: The function replaces each letter of the word found at 
+    the specified direction and index with an asterisk and updates the letter 
+    list accordingly
+
+    Parameters:
+    -----------
+    Input:  list: 
+                list of letters 
+            string:
+                A word
+            integer:
+                index and direction
+
+    Returns: No return statement:
+                Updates letter_list  
+
+    --------
+    Examples:
+    >>> letter_list= ["A","R","C","K","R"]
+    >>>cross_word_position_direction(letter_list,"ARC",0,1)
+    >>>letter_list
+    ['*', '*', '*', 'K', 'R']
+
+    >>>letter_list=["H","E","L","L","O"]
+    >>>cross_word_position_direction(letter_list,"LLO",2,1)
+    >>>letter_list
+    ['H','E','*', '*', '*']
+
+    >>>letter_list=["H","A","T","L","K","O"]
+    >>>cross_word_position_direction(letter_list,"OKL",5,-1)
+    >>>letter_list
+    ['H', 'A', 'T', '*', '*', '*']
+
+    """ 
+    l = len(word)
+    for i in range(l):
+        letter_list[(direction*i)+index]="*" #crossing out letters with *
+
+
+# Question 7 
+def cross_word_all_position_direction(letter_list,word, dict_position_direction):
+    """
+    Description: The function iterates over evey key in the dictionary
+    calls cross_word_position_direction to 
+    replace the letters at the specific position and direction with an
+    astrisk and updates letter_list accordingly.
+
+    Parameters:
+    -----------
+    Input:  list: 
+                list of letters 
+            string:
+                A word
+            dict:
+                dictionary of directions and positions of the word in the list
+
+
+    Returns: No return statement:
+                updates letter_list  
+
+    --------
+    Examples:
+    >>> letter_list= ["A","R","C","K","C","R","A"]
+    >>>cross_word_all_position_direction(letter_list, "ARC",{0:[1],6:[-1]})
+    >>>letter_list
+    ['*', '*', '*', 'K', '*', '*', '*']
+
+    >>>letter_list = ["A","R","C","K","C","R","A"]
+    >>>cross_word_all_position_direction(letter_list, "KC",{3:[-1,1]})
+    >>>letter_list
+    ['A', 'R', '*', '*', '*', 'R', 'A']
+
+    >>>letter_list = ["A","R","C","K","C","R","A"]
+    >>>cross_word_all_position_direction(letter_list, "KC",{6:[-1,1]})
+    Traceback (most recent call last):
+        File "<stdin>", line 1, in <module>
+        File "<string>", line 256, in cross_word_all_position_direction
+        File "<string>", line 221, in cross_word_position_direction
+    IndexError: list assignment index out of range
+  
+    """
+    for key in dict_position_direction.keys():
+        for position in dict_position_direction[key]:
+            cross_word_position_direction(letter_list,word,key,position)
+            #calling previous function to cross out letters 
+
+
+# Question 8
+def find_magic_word(letter_list):
+    """
+    Description: Function goes through list of letters to find the 
+    hidden word by grouping the non-astrisk letters to find the magic word
+
+    Parameters:
+    -----------
+    Input:  list: 
+                list of letters 
+
+
+    Returns: string:
+             the magic word in the list   
+
+    --------
+    Examples:
+    >>> find_magic_word(["A","R","C","*","*"])
+    'ARC' 
+    >>> find_magic_word(["*","*","*","*","*"]) 
+    ''
+    >>>find_magic_word(["A","R","*","K","R"])
+    'ARKR'
+    """
+    word = []
+    for i in letter_list:
+        if i != "*":
+            word.append(i)
+    return "".join(word) #appending all the non * letters into a string
+
+
+#Question 9 
+def word_search(letter_list,word_list):
+    """
+    Description: Calls position_direction_word and 
+    cross_word_all_position_direction to cross out
+    the words in the list and returns the magic word by calling the
+    find_magic_word function.
+
+    Parameters:
+    -----------
+    Input:  list: 
+                list of letters and word list 
+
+    Returns: string:
+             the magic word 
+
+    --------
+    Examples:
+    >>> word_search(["H","A","P","P","Y","Y","E","B","Y","E","N","O"],\
+     ["B","Y","E","H","A","P","P","Y"])
+    'NO'
+     >>> word_search(["H","A","P","P","Y","Y","E","B","Y","E","N","O"], \
+     ["H","A","P","P","Y"])
+    'EBENO' 
+    ""
+     >>>word_search(["H","A","P","P","Y","Y","E","B","Y","E","N","O"],["N","O"])
+    HAPPYYEBYE
+    """
+    for word in word_list:
+        #cross out all words in the list 
+        position_direction = position_direction_word(letter_list,word)
+        cross_word_all_position_direction(letter_list,word,position_direction)
+    return find_magic_word(letter_list)
+    #returns magic word
+
+
+#Question 10
+def word_search_main(filepath): 
+    """
+    Description:
+         Function will read the first line of letters in the file 
+         and convert it to a list of characters.
+         The function will then read the next lines that 
+         contain specifc words and use this to create a word list
+         Finally the function will call word_search using 
+         the list of letters and word_list to return the magic word. 
+
+    Parameters:
+    -----------
+    Input:  string:
+                File path to text file 
+
+    Returns: string:
+                The magic word 
+    --------
+    Examples:
+    
+    if my_file.txt = HELLOHIHAPPYBYE
+                     HELLO
+                     HI
+                     HAPPY
+
+    >>>word_search_main(my_file.txt)
+    letter_list = ['H','E','L','L','O','H','I','H','A','P','P','Y','B','Y','E']
+    word_list = ['HELLO', 'HI', 'HAPPY']
+    >>> word_search(letter_list, word_list)
+    'BYE'
+     
+    >>>word_search_main()
+    Traceback (most recent call last):
+         File "/home/word_search.py", line 388, in <module>
+            word_search_main()
+    TypeError: word_search_main() missing 1 required positional argument:\
+    'filepath'
+
+    >>>word_search_main("")
+    Traceback (most recent call last):
+        File "/home/word_search.py", line 395, in <module>
+            word_search_main("")
+        File "/home/word_search.py", line 385, in word_search_main
+            fobj = open(filepath,'r')
+    FileNotFoundError: [Errno 2] No such file or directory: ''
+    
+    """
+    fobj = open(filepath,'r')
+    content = fobj.read() #opens the file, reads it, then stors its information  
+    fobj.close()
+    content = content.strip()#converts to list of characters 
+    content = content.upper()
+    content = content.split('\n')
+    list_of_letter = content.pop(0)#uses list for word_search function
+    list_of_letter = list(list_of_letter)
+    return word_search(list_of_letter,content)
+
+
+
